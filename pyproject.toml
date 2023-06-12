@@ -11,6 +11,7 @@ python = "^3.10"
 
 [tool.poetry.scripts]
 gendiff = "gendiff.scripts.gendiff:main"
+generate_diff = "gendiff.scripts.generate_diff:generate_diff"
 
 [build-system]
 requires = ["poetry-core"]
