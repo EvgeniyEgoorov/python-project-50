@@ -6,7 +6,7 @@ def generate_diff(file_path1, file_path2):
     file_content1 = json.load(open(file_path1))
     file_content2 = json.load(open(file_path2))
 
-    union_keys = sorted(file_content1 | file_content2)
+    union_keys = sorted({**file_content1, **file_content2}.keys())
 
     result = "{"
 
