@@ -5,7 +5,7 @@ from yaml.loader import BaseLoader
 from pathlib import Path
 
 
-def read_file(file_path) -> dict:
+def read_file(file_path) -> Dict:
     extension = Path(file_path).suffix
     if extension == ".json":
         return json.load(open(file_path))
@@ -16,7 +16,7 @@ def read_file(file_path) -> dict:
         raise TypeError(f"Unsupported file format: '{extension}'")
 
 
-def generate_diff(file_path1, file_path2):
+def generate_diff(file_path1, file_path2) -> str:
 
     file_content1 = read_file(file_path1)
     print(file_content1)
