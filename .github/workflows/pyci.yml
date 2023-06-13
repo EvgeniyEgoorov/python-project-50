@@ -20,7 +20,7 @@ jobs:
         # make depends on poetry
       - name: Install dependencies
         run: |
-          pip install poetry flake8 pytest
+          pip install poetry flake8 pytest pyyaml
           make install
       - name: Run linter and pytest
         run: |
