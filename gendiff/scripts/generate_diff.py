@@ -1,5 +1,5 @@
 import json
-from typing import Dict
+from typing import Dict, Optional
 import yaml
 from yaml.loader import BaseLoader
 from pathlib import Path
@@ -16,27 +16,49 @@ def read_file(file_path) -> Dict:
         raise TypeError(f"Unsupported file format: '{extension}'")
 
 
-def generate_diff(file_path1, file_path2) -> str:
+def process_common_key(tree1, tree2, key):
+    if all(
+        [
+            (isinstance(tree1[key], dict)),
+            (isinstance(tree2[key], dict)),
+        ]
+    ):
+        return {"children": create_diff_ast(tree1[key], tree2[key])}
+    elif tree1[key] != tree2[key]:
+        return {"minus": tree1[key], "plus": tree2[key]}
+    else:
+        return {"equal": tree1[key]}
 
-    file_content1 = read_file(file_path1)
-    print(file_content1)
-    file_content2 = read_file(file_path2)
 
-    union_keys = sorted({**file_content1, **file_content2}.keys())
+def process_tree1_key(tree1, key):
+    return {"minus": tree1[key]}
 
-    result = "{"
 
-    for key in union_keys:
-        if key not in file_content2:
-            result += f"\n    - {key}: {file_content1[key]}"
-        elif key not in file_content1:
-            result += f"\n    + {key}: {file_content2[key]}"
-        elif file_content1[key] != file_content2[key]:
-            result += f"\n    - {key}: {file_content1[key]}"
-            result += f"\n    + {key}: {file_content2[key]}"
+def process_tree2_key(tree2, key):
+    return {"plus": tree2[key]}
+
+
+def create_diff_ast(tree1, tree2):
+    result = {}
+    for key in sorted(set(tree1) | set(tree2)):
+        if all([(key in tree1), (key in tree2)]):
+            result[key] = process_common_key(tree1, tree2, key)
+        elif key in tree1:
+            result[key] = process_tree1_key(tree1, key)
         else:
-            result += f"\n      {key}: {file_content2[key]}"
-
-    result += "\n}"
-
+            result[key] = process_tree2_key(tree2, key)
     return result
+
+
+from collections import defaultdict
+
+
+def stylish(diff):
+    return diff
+
+
+def generate_diff(file1, file2):
+
+    tree1 = read_file(file1)
+    tree2 = read_file(file2)
+    return stylish(create_diff_ast(tree1, tree2))
