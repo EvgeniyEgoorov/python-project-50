@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Optional
+from typing import Dict
 import yaml
 from yaml.loader import BaseLoader
 from pathlib import Path
@@ -30,31 +30,40 @@ def process_common_key(tree1, tree2, key):
         return {"equal": tree1[key]}
 
 
-def process_tree1_key(tree1, key):
-    return {"minus": tree1[key]}
-
-
-def process_tree2_key(tree2, key):
-    return {"plus": tree2[key]}
-
-
 def create_diff_ast(tree1, tree2):
     result = {}
     for key in sorted(set(tree1) | set(tree2)):
         if all([(key in tree1), (key in tree2)]):
             result[key] = process_common_key(tree1, tree2, key)
         elif key in tree1:
-            result[key] = process_tree1_key(tree1, key)
+            result[key] = {"minus": tree1[key]}
         else:
-            result[key] = process_tree2_key(tree2, key)
+            result[key] = {"plus": tree2[key]}
     return result
 
 
-from collections import defaultdict
-
-
 def stylish(diff):
-    return diff
+    def inner(diff):
+        result = {}
+        for key, value in diff.items():
+            if all([("minus" in value), ("plus" in value)]):
+                result[f"- {key}"] = value["minus"]
+                result[f"+ {key}"] = value["plus"]
+            elif "plus" in value:
+                result[f"+ {key}"] = value["plus"]
+            elif "minus" in value:
+                result[f"- {key}"] = value["minus"]
+            elif "equal" in value:
+                result[key] = value["equal"]
+            else:
+                result[key] = inner(value["children"])
+        return result
+    result = json.dumps(inner(diff), indent=4)
+    result = result.replace('"', '')
+    result = result.replace(',', '')
+    result = result.replace('  + ', '+ ')
+    result = result.replace('  - ', '- ')
+    return result
 
 
 def generate_diff(file1, file2):

@@ -20,7 +20,8 @@ cases = [
 	build_test_case(f1, f2) for f1, f2 in [
 		["file1.json", "file2.json"],
 		["file3.yml", "file4.yml"],
-		["file5.json", "file6.json"]
+		["file5.json", "file6.json"],
+		["file7.yml", "file8.yml"],
 	]
 ]
 
