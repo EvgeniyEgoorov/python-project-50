@@ -28,5 +28,5 @@ cases = [
 
 @pytest.mark.parametrize("path1, path2, expected", cases)
 def test_gendiff(path1, path2, expected):
-    result = generate_diff(path1, path2)
+    result = generate_diff(path1, path2, "stylish")
     assert result == expected
