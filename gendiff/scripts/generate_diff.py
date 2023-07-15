@@ -23,11 +23,11 @@ def process_common_key(tree1, tree2, key):
             (isinstance(tree2[key], dict)),
         ]
     ):
-        return {"children": create_diff_ast(tree1[key], tree2[key])}
+        return ("children", create_diff_ast(tree1[key], tree2[key]))
     elif tree1[key] != tree2[key]:
-        return {"changed": {"removed": tree1[key], "added": tree2[key]}}
+        return ("changed", {"removed": tree1[key], "added": tree2[key]})
     else:
-        return {"unchanged": tree1[key]}
+        return ("unchanged", tree1[key])
 
 
 def create_diff_ast(tree1, tree2):
@@ -36,9 +36,9 @@ def create_diff_ast(tree1, tree2):
         if all([(key in tree1), (key in tree2)]):
             result[key] = process_common_key(tree1, tree2, key)
         elif key in tree1:
-            result[key] = {"removed": tree1[key]}
+            result[key] = ("removed", tree1[key])
         else:
-            result[key] = {"added": tree2[key]}
+            result[key] = ("added", tree2[key])
     return result
 
 
@@ -68,14 +68,13 @@ def format_diff(diff):
         "unchanged": lambda k, v: {k: v}
     }
     for key, value in diff.items():
-        sub_key, sub_value = list(value.items())[0]
-        sub_formatter = sub_formatters_list[sub_key]
-        result.update(sub_formatter(key, sub_value))
+        marker, value = value
+        sub_formatter = sub_formatters_list[marker]
+        result.update(sub_formatter(key, value))
     return result
 
 
 def format_stylish(diff):
-    print(diff)
     return prettify_output(format_diff(diff))
 
 
