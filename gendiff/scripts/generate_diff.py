@@ -1,8 +1,11 @@
 import json
-from typing import Dict
 import yaml
 from yaml.loader import BaseLoader
+from typing import Dict
 from pathlib import Path
+
+from gendiff.scripts.formatters.plain import format_plain
+from gendiff.scripts.formatters.stylish import format_stylish
 
 
 def read_file(file_path) -> Dict:
@@ -42,45 +45,10 @@ def create_diff_ast(tree1, tree2):
     return result
 
 
-def prettify_output(output):
-    output = json.dumps(output, indent=4)
-    patterns = {
-        '"': '',
-        ',': '',
-        '  + ': '+ ',
-        '  - ': '- '
-    }
-    for old, new in patterns.items():
-        output = output.replace(old, new)
-    return output
-
-
-def format_diff(diff):
-    result = {}
-    sub_formatters_list = {
-        "changed": lambda k, v: {
-            f"- {k}": v["removed"],
-            f"+ {k}": v["added"]
-        },
-        "added": lambda k, v: {f"+ {k}": v},
-        "removed": lambda k, v: {f"- {k}": v},
-        "children": lambda k, v: {k: format_diff(v)},
-        "unchanged": lambda k, v: {k: v}
-    }
-    for key, value in diff.items():
-        marker, value = value
-        sub_formatter = sub_formatters_list[marker]
-        result.update(sub_formatter(key, value))
-    return result
-
-
-def format_stylish(diff):
-    return prettify_output(format_diff(diff))
-
-
 def generate_diff(file1, file2, format):
     formatters_list = {
         "stylish": format_stylish,
+        "plain": format_plain
     }
     formatter = formatters_list.get(format)
     if not formatter:
