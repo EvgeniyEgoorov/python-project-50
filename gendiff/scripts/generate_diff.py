@@ -25,7 +25,7 @@ def process_common_key(tree1, tree2, key):
     ):
         return {"children": create_diff_ast(tree1[key], tree2[key])}
     elif tree1[key] != tree2[key]:
-        return {"removed": tree1[key], "added": tree2[key]}
+        return {"changed": {"removed": tree1[key], "added": tree2[key]}}
     else:
         return {"unchanged": tree1[key]}
 
@@ -42,7 +42,8 @@ def create_diff_ast(tree1, tree2):
     return result
 
 
-def pretty_output(output):
+def prettify_output(output):
+    output = json.dumps(output, indent=4)
     patterns = {
         '"': '',
         ',': '',
@@ -54,29 +55,33 @@ def pretty_output(output):
     return output
 
 
-def stylish(diff):
-    def inner(diff):
-        result = {}
-        for key, value in diff.items():
-            if all([("removed" in value), ("added" in value)]):
-                result[f"- {key}"] = value["removed"]
-                result[f"+ {key}"] = value["added"]
-            elif "added" in value:
-                result[f"+ {key}"] = value["added"]
-            elif "removed" in value:
-                result[f"- {key}"] = value["removed"]
-            elif "unchanged" in value:
-                result[key] = value["unchanged"]
-            else:
-                result[key] = inner(value["children"])
-        return result
-    result = json.dumps(inner(diff), indent=4)
-    return pretty_output(result)
+def format_diff(diff):
+    result = {}
+    sub_formatters_list = {
+        "changed": lambda k, v: {
+            f"- {k}": v["removed"],
+            f"+ {k}": v["added"]
+        },
+        "added": lambda k, v: {f"+ {k}": v},
+        "removed": lambda k, v: {f"- {k}": v},
+        "children": lambda k, v: {k: format_diff(v)},
+        "unchanged": lambda k, v: {k: v}
+    }
+    for key, value in diff.items():
+        sub_key, sub_value = list(value.items())[0]
+        sub_formatter = sub_formatters_list[sub_key]
+        result.update(sub_formatter(key, sub_value))
+    return result
+
+
+def format_stylish(diff):
+    print(diff)
+    return prettify_output(format_diff(diff))
 
 
 def generate_diff(file1, file2, format):
     formatters_list = {
-        "stylish": stylish,
+        "stylish": format_stylish,
     }
     formatter = formatters_list.get(format)
     if not formatter:
