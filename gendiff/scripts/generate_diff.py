@@ -4,6 +4,7 @@ from yaml.loader import BaseLoader
 from typing import Dict
 from pathlib import Path
 
+from gendiff.scripts.formatters.json import format_json
 from gendiff.scripts.formatters.plain import format_plain
 from gendiff.scripts.formatters.stylish import format_stylish
 
@@ -48,7 +49,8 @@ def create_diff_ast(tree1, tree2):
 def generate_diff(file1, file2, format):
     formatters_list = {
         "stylish": format_stylish,
-        "plain": format_plain
+        "plain": format_plain,
+        "json": format_json
     }
     formatter = formatters_list.get(format)
     if not formatter:

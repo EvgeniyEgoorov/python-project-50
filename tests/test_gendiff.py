@@ -22,6 +22,8 @@ cases = [
 		["file3.yml", "file4.yml", "stylish"],
 		["file1.json", "file2.json", "plain"],
 		["file3.yml", "file4.yml", "plain"],
+		["file1.json", "file2.json", "json"],
+		["file3.yml", "file4.yml", "json"],
 	]
 ]
 

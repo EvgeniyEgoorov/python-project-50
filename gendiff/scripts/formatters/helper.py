@@ -1,5 +1,4 @@
 def prettify_output(output):
-    # output = json.dumps(output, indent=4)
     patterns = {
         '"': '',
         ',': '',
