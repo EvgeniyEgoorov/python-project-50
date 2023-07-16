@@ -1,3 +1,6 @@
+from gendiff.scripts.formatters.helper import prettify_output
+
+
 SUB_FORMATTERS_LIST = {
     "added": lambda p, v: (
         f"Property '{p}' was added with value: {process_value(v)}"
@@ -25,18 +28,6 @@ def process_value(value):
     if type(value) == int:
         return value
     return f"'{value}'"
-
-
-def prettify_output(output):
-    patterns = {
-        '"': '',
-        "'false'": 'false',
-        "'true'": 'true',
-        "'null'": 'null'
-    }
-    for old, new in patterns.items():
-        output = output.replace(old, new)
-    return output
 
 
 def format_diff(diff, path=''):

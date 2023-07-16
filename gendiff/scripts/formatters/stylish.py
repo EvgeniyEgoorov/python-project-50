@@ -1,37 +1,29 @@
 import json
 
+from gendiff.scripts.formatters.helper import prettify_output
 
-def prettify_output(output):
-    output = json.dumps(output, indent=4)
-    patterns = {
-        '"': '',
-        ',': '',
-        '  + ': '+ ',
-        '  - ': '- '
-    }
-    for old, new in patterns.items():
-        output = output.replace(old, new)
-    return output
+
+SUB_FORMATTERS_LIST = {
+    "changed": lambda k, v: {
+        f"- {k}": v["removed"],
+        f"+ {k}": v["added"]
+    },
+    "added": lambda k, v: {f"+ {k}": v},
+    "removed": lambda k, v: {f"- {k}": v},
+    "children": lambda k, v: {k: format_diff(v)},
+    "unchanged": lambda k, v: {k: v}
+}
 
 
 def format_diff(diff):
     result = {}
-    sub_formatters_list = {
-        "changed": lambda k, v: {
-            f"- {k}": v["removed"],
-            f"+ {k}": v["added"]
-        },
-        "added": lambda k, v: {f"+ {k}": v},
-        "removed": lambda k, v: {f"- {k}": v},
-        "children": lambda k, v: {k: format_diff(v)},
-        "unchanged": lambda k, v: {k: v}
-    }
     for key, value in diff.items():
         marker, value = value
-        sub_formatter = sub_formatters_list[marker]
+        sub_formatter = SUB_FORMATTERS_LIST[marker]
         result.update(sub_formatter(key, value))
     return result
 
 
 def format_stylish(diff):
-    return prettify_output(format_diff(diff))
+    result = json.dumps(format_diff(diff), indent=4)
+    return prettify_output(result)
