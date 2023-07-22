@@ -46,7 +46,7 @@ def create_diff_ast(tree1, tree2):
     return result
 
 
-def generate_diff(file1, file2, format):
+def generate_diff(file1, file2, format="stylish"):
     formatters_list = {
         "stylish": format_stylish,
         "plain": format_plain,
