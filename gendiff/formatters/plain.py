@@ -25,7 +25,9 @@ def process_value(value):
         return '[complex value]'
     if type(value) == bool:
         return str(value).lower()
-    if type(value) == int:
+    if isinstance(value, str) and value.isdigit():
+        return int(value)
+    if isinstance(value, int):
         return value
     return f"'{value}'"
 
