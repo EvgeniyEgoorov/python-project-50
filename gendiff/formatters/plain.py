@@ -23,7 +23,9 @@ def process_prop(key, path):
 def process_value(value):
     if type(value) in [dict, set]:
         return '[complex value]'
-    if type(value) == bool:
+    if value is None:
+        return 'null'
+    if isinstance(value, bool):
         return str(value).lower()
     if isinstance(value, str) and value.isdigit():
         return int(value)
