@@ -4,9 +4,9 @@ from yaml.loader import BaseLoader
 from typing import Dict
 from pathlib import Path
 
-from gendiff.scripts.formatters.json import format_json
-from gendiff.scripts.formatters.plain import format_plain
-from gendiff.scripts.formatters.stylish import format_stylish
+from gendiff.formatters.json import format_json
+from gendiff.formatters.plain import format_plain
+from gendiff.formatters.stylish import format_stylish
 
 
 def read_file(file_path) -> Dict:

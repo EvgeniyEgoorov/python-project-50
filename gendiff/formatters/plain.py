@@ -1,4 +1,4 @@
-from gendiff.scripts.formatters.helper import prettify_output
+from gendiff.formatters.helper import prettify_output
 
 
 SUB_FORMATTERS_LIST = {
